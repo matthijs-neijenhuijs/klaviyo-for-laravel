@@ -10,6 +10,7 @@ use DutchBridge\KlaviyoForLaravel\Jobs\SendKlaviyoIdentify;
 use DutchBridge\KlaviyoForLaravel\Jobs\SendKlaviyoTrack;
 use DutchBridge\KlaviyoForLaravel\Support\BulkEventManager;
 use DutchBridge\KlaviyoForLaravel\Support\CacheManager;
+use DutchBridge\KlaviyoForLaravel\Support\EventBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -440,6 +441,102 @@ class KlaviyoClient
     {
         $cacheKey = $this->cache->profileKey($identity);
         return $this->cache->forget($cacheKey);
+    }
+
+    /**
+     * Add events to bulk processing queue.
+     *
+     * @param TrackEvent ...$events
+     * @return void
+     */
+    public function trackBulk(TrackEvent ...$events): void
+    {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        $validEvents = collect($events)
+            ->reject(fn($event) => empty($event->identity));
+
+        $this->bulkEventManager->addMany($validEvents);
+
+        // Process ready batches
+        $readyBatches = $this->bulkEventManager->getReadyEvents();
+        foreach ($readyBatches as $batch) {
+            if ($batch instanceof Collection && $batch->isNotEmpty()) {
+                dispatch(new SendKlaviyoTrack(...$batch->all()));
+            }
+        }
+    }
+
+    /**
+     * Process multiple identify requests in bulk.
+     *
+     * @param array $profiles Array of identity arrays
+     * @return void
+     */
+    public function identifyBulk(array $profiles): void
+    {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        $validProfiles = collect($profiles)
+            ->map(fn($profile) => $this->resolveIdentity($profile))
+            ->filter()
+            ->chunk(config('klaviyo.bulk.max_events_per_request', 100));
+
+        foreach ($validProfiles as $batch) {
+            foreach ($batch as $profile) {
+                dispatch(new SendKlaviyoIdentify($profile));
+            }
+        }
+    }
+
+    /**
+     * Force flush all pending bulk events.
+     *
+     * @return void
+     */
+    public function flushBulkEvents(): void
+    {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        $batches = $this->bulkEventManager->flush();
+        foreach ($batches as $batch) {
+            if ($batch instanceof Collection && $batch->isNotEmpty()) {
+                dispatch(new SendKlaviyoTrack(...$batch->all()));
+            }
+        }
+    }
+
+    /**
+     * Get the current bulk event manager instance.
+     *
+     * @return BulkEventManager
+     */
+    public function bulkEvents(): BulkEventManager
+    {
+        return $this->bulkEventManager;
+    }
+
+    /**
+     * Create a new event builder instance.
+     *
+     * @param string|null $eventName Optional event name to start with
+     * @return EventBuilder
+     */
+    public function event(?string $eventName = null): EventBuilder
+    {
+        $builder = new EventBuilder($this);
+        
+        if ($eventName) {
+            $builder->name($eventName);
+        }
+        
+        return $builder;
     }
 
     public function __call($method, $parameters)

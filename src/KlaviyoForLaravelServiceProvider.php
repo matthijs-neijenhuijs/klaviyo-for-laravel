@@ -2,9 +2,12 @@
 
 namespace DutchBridge\KlaviyoForLaravel;
 
+use DutchBridge\KlaviyoForLaravel\Http\Controllers\KlaviyoWebhookController;
+use DutchBridge\KlaviyoForLaravel\Http\Middleware\KlaviyoWebhookSecurity;
 use DutchBridge\KlaviyoForLaravel\View\Creators\InitializeCreator;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,6 +29,8 @@ class KlaviyoForLaravelServiceProvider extends ServiceProvider
         View::creator('klaviyo::initialize', InitializeCreator::class);
 
         Event::subscribe(UserEventSubscriber::class);
+
+        $this->registerWebhookRoutes();
     }
 
     /**
@@ -54,5 +59,24 @@ class KlaviyoForLaravelServiceProvider extends ServiceProvider
         $this->app->resolving(EncryptCookies::class, function (EncryptCookies $middleware) {
             $middleware->disableFor('__kla_id');
         });
+    }
+
+    /**
+     * Register webhook routes.
+     *
+     * @return void
+     */
+    protected function registerWebhookRoutes(): void
+    {
+        if (!config('klaviyo.enabled', true)) {
+            return;
+        }
+
+        Route::middleware(['api', KlaviyoWebhookSecurity::class])
+            ->prefix('klaviyo')
+            ->group(function () {
+                Route::post('webhook', KlaviyoWebhookController::class)
+                    ->name('klaviyo.webhook');
+            });
     }
 }

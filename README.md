@@ -1,6 +1,18 @@
-# laravel-klaviyo
+# Laravel Klaviyo Package
 
-This package assists with interacting with [Klaviyo](https://www.klaviyo.com/) to track client and server-side metrics and the REST api.
+A comprehensive Laravel package for integrating with [Klaviyo](https://www.klaviyo.com/) that provides robust server-side tracking, client-side script management, webhook handling, and advanced features like bulk operations, caching, and fluent API design.
+
+## Features
+
+- 🚀 **Server-side event tracking** with retry logic and error handling
+- 📊 **Bulk operations** for high-volume event processing  
+- 🔄 **Webhook support** with signature verification and event dispatching
+- 💾 **Intelligent caching** to reduce API calls and improve performance
+- 🛠️ **Fluent API** for building and tracking events with chainable methods
+- 🔒 **Security features** including rate limiting and API key validation
+- ⚡ **Queue optimization** with job batching and retry policies
+- 🧪 **Comprehensive testing** suite included
+- 📝 **Type-safe** with full PHP 8+ type declarations and PHPDoc
 
 ## Requirements
 
