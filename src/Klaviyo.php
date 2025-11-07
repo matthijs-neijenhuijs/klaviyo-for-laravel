@@ -1,0 +1,29 @@
+<?php
+
+namespace DutchBridge\KlaviyoForLaravel;
+
+use Illuminate\Support\Facades\Facade;
+
+/**
+ * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
+ * @method static \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
+ * @method static \Illuminate\Http\Client\Response head(string $url, array|string|null $query = null)
+ * @method static \Illuminate\Http\Client\Response patch(string $url, array $data = [])
+ * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])
+ * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
+ * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
+ * @method static \Illuminate\Http\Client\PendingRequest async(bool $async = true)
+ * @method static array pool(callable $callback)
+ */
+class Klaviyo extends Facade
+{
+    /**
+     * Get the registered name of the component.
+     *
+     * @return string
+     */
+    protected static function getFacadeAccessor(): string
+    {
+        return 'klaviyo';
+    }
+}
