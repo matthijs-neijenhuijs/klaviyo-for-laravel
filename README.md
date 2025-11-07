@@ -25,7 +25,7 @@ It is recommended that server-side events are processed in the background, by de
 You can install the package via composer:
 
 ```bash
-composer require eonvisualmedia/laravel-klaviyo
+composer require dutchbridge/klaviyo-for-laravel
 ```
 
 The package will automatically register itself.

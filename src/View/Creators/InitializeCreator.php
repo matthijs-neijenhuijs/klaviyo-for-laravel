@@ -1,9 +1,9 @@
 <?php
 
-namespace EonVisualMedia\LaravelKlaviyo\View\Creators;
+namespace DutchBridge\KlaviyoForLaravel\View\Creators;
 
-use EonVisualMedia\LaravelKlaviyo\Contracts\KlaviyoIdentity;
-use EonVisualMedia\LaravelKlaviyo\KlaviyoClient;
+use DutchBridge\KlaviyoForLaravel\Contracts\KlaviyoIdentity;
+use DutchBridge\KlaviyoForLaravel\KlaviyoClient;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
