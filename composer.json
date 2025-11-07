@@ -1,5 +1,5 @@
 {
-    "name": "dutchbridge/klaviyo-for-laravel",
+    "name": "matthijs-neijenhuijs/klaviyo-for-laravel",
     "description": "Interact with the Klaviyo API from your Laravel app",
     "license": "MIT",
     "authors": [
